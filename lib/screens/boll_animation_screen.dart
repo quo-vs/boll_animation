@@ -71,16 +71,37 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     }
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<bool> _willPopCallback() async {
+    _controller.stop();
+    var coordinates = AnimationHelper.getBollCoordinates(
+        _screenWidth, _screenHeight, _alignment);
+
+    setState(() {
+      firstRun = true;
+    });
+    Navigator.pop(context, coordinates);
+    return Future.value(true);
+  }
+
   void _runAnimation() async {
     Alignment _end;
     if (firstRun) {
       firstRun = false;
-      _end = AnimationHelper.findEndPointForFirstMove(_alignment, _animationSpeed);
+      _end =
+          AnimationHelper.findEndPointForFirstMove(_alignment, _animationSpeed);
     } else {
-      _end = AnimationHelper.findEndPointForNextMove(_alignment, _animationSpeed);
+      _end =
+          AnimationHelper.findEndPointForNextMove(_alignment, _animationSpeed);
     }
 
-    _animation = _controller.drive(AlignmentTween(begin: _alignment, end: _end));
+    _animation =
+        _controller.drive(AlignmentTween(begin: _alignment, end: _end));
 
     _controller.reset();
     _controller.forward();
@@ -97,7 +118,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           iconTheme: const IconThemeData(
             color: Colors.black,
           ),
-          leading:  IconButton(
+          leading: IconButton(
             onPressed: _willPopCallback,
             icon: const Icon(Icons.arrow_back),
           ),
@@ -115,23 +136,5 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
         ),
       ),
     );
-  }
-
-  Future<bool> _willPopCallback() async {
-    _controller.stop();
-    var coordinates = AnimationHelper.getBollCoordinates(
-        _screenWidth, _screenHeight, _alignment);
-
-    setState(() {
-      firstRun = true;
-    });
-    Navigator.pop(context, coordinates);
-    return Future.value(true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

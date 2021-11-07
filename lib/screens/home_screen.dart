@@ -25,6 +25,11 @@ class _HomeScreenState extends State<HomeScreen> {
           'Set Animation Speed',
           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 1,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
       ),
       body: Center(
         child: Column(
@@ -108,28 +113,30 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 20,
             ),
             ElevatedButton(
-                onPressed: () async {
-                  if (_xSpeed == 0 && _ySpeed == 0) {
-                    showErrorAlert(context, 'Please set at least one step speed.');
-                    return;
-                  }
+              onPressed: () async {
+                if (_xSpeed == 0 && _ySpeed == 0) {
+                  showErrorAlert(
+                      context, 'Please set at least one step speed.');
+                  return;
+                }
 
-                  var result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => BollAnimationScreen(
-                          animationSpeed:
-                              AnimationSpeed(x: _xSpeed, y: _ySpeed)),
-                      fullscreenDialog: true,
+                var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => BollAnimationScreen(
+                      animationSpeed: AnimationSpeed(x: _xSpeed, y: _ySpeed),
                     ),
-                  );
-                  if (result != null) {
-                    setState(() {
-                      _coordinates = result;
-                    });
-                  }
-                },
-                child: const Text('Show Animation')),
+                    fullscreenDialog: true,
+                  ),
+                );
+                if (result != null) {
+                  setState(() {
+                    _coordinates = result;
+                  });
+                }
+              },
+              child: const Text('Show Animation'),
+            ),
             const SizedBox(
               height: 50,
             ),
@@ -137,7 +144,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "Boll Coordinates: X:${_coordinates!.x} Y:${_coordinates!.y} ",
                 style: const TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 22.0),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22.0,
+                ),
               ),
           ],
         ),
