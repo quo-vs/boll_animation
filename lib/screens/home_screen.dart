@@ -32,10 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Text(
               "Set Horizontal Step Speed",
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24.0),
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22.0),
             ),
             const SizedBox(
-              height: 50.0,
+              height: 20.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -68,10 +68,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Text(
               "Set Vertical Step Speed",
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24.0),
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22.0),
             ),
             const SizedBox(
-              height: 50.0,
+              height: 20.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text(
                 'Show Animation'
               )
-            )
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            const Text(
+              "Boll Coordinates:",
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22.0),
+            ),
           ],
         ),
       ),

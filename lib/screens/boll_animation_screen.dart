@@ -1,21 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:math';
 
-import 'package:boll_animation/models/animation_speed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
-enum MoveDirection {
-  DownLeft,
-  DownRight,
-  UpLeft,
-  UpRight,
-  Left,
-  Right,
-  Up,
-  Down
-}
+import '../models/animation_speed.dart';
+import '../utils/animation_helper.dart';
 
 class BollAnimationScreen extends StatefulWidget {
   static const routeName = '/boll-animation';
@@ -34,7 +23,6 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   late Animation<Alignment> _animation;
   late double _screenWidth;
   late double _screenHeight;
-  double animationSpeedRate = 0.001;
 
   late MoveDirection previousMoveDirection;
 
@@ -84,269 +72,16 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     }
   }
 
-  bool isBiggerOREqual(double a, double b) {
-    var aString = a.toStringAsFixed(10);
-    var bString = b.toStringAsFixed(10);
-    var decimalPartIfZero = 000000001;
-
-    var aIntPart = num.parse(aString.split('.')[0]);
-    var aDecimalPart = num.parse(aString.split('.')[1]);
-    aDecimalPart = aDecimalPart == 0 ? decimalPartIfZero : aDecimalPart;
-
-    var bIntPart = num.parse(bString.split('.')[0]);
-    var bDecimalPart = num.parse(bString.split('.')[1]);
-    bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
-
-    return (aIntPart > bIntPart) ||
-        (aIntPart == bIntPart &&
-            aIntPart.isNegative &&
-            bIntPart.isNegative &&
-            aDecimalPart <= bDecimalPart) ||
-        (aIntPart == bIntPart &&
-            !aIntPart.isNegative &&
-            !bIntPart.isNegative &&
-            aDecimalPart >= bDecimalPart);
-  }
-
-  bool isLessOREqual(double a, double b) {
-    var aString = a.toStringAsFixed(10);
-    var bString = b.toStringAsFixed(10);
-    var decimalPartIfZero = 1;
-
-    var aIntPart = num.parse(aString.split('.')[0]);
-    var aDecimalPart = num.parse(aString.split('.')[1]);
-    aDecimalPart = aDecimalPart == 0 ? decimalPartIfZero : aDecimalPart;
-
-    var bIntPart = num.parse(bString.split('.')[0]);
-    var bDecimalPart = num.parse(bString.split('.')[1]);
-    bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
-
-    return (aIntPart < bIntPart) ||
-        (aIntPart == bIntPart &&
-            !aIntPart.isNegative &&
-            !bIntPart.isNegative &&
-            aDecimalPart <= bDecimalPart) ||
-        (aIntPart == bIntPart &&
-            aIntPart.isNegative &&
-            bIntPart.isNegative &&
-            aDecimalPart >= bDecimalPart);
-  }
-
-  Alignment _findEndPointForFirstMove() {
-    Alignment _endPoint;
-    if (_animationSpeed.y == 0) {
-      _endPoint = _findEndPointHorizontal(_alignment, MoveDirection.Left);
-      previousMoveDirection = MoveDirection.Left;
-    } else if (_animationSpeed.x == 0) {
-      _endPoint = _findEndPointVertical(_alignment, MoveDirection.Down);
-      previousMoveDirection = MoveDirection.Down;
-    } else {
-      _endPoint = _findEndPointMoveDownLeft(_alignment);
-      previousMoveDirection = MoveDirection.DownLeft;
-    }
-    return _endPoint;
-  }
-
-  Alignment _findEndPointForNextMove() {
-    Alignment _endPoint;
-    if (_animationSpeed.y == 0) {
-      var _nextMoveDirection = previousMoveDirection == MoveDirection.Left
-          ? MoveDirection.Right
-          : MoveDirection.Left;
-      _endPoint = _findEndPointHorizontal(_alignment, _nextMoveDirection);
-      previousMoveDirection = _nextMoveDirection;
-    } else if (_animationSpeed.x == 0) {
-      var _nextMoveDirection = previousMoveDirection == MoveDirection.Up
-          ? MoveDirection.Down
-          : MoveDirection.Up;
-      _endPoint = _findEndPointVertical(_alignment, _nextMoveDirection);
-      previousMoveDirection = _nextMoveDirection;
-    } else {
-      switch (previousMoveDirection) {
-        case MoveDirection.DownLeft:
-          {
-            if (isBiggerOREqual(_alignment.x, 1.0) &&
-                isLessOREqual(_alignment.y, 1.0)) {
-              _endPoint = _findEndPointMoveDownRight(_alignment);
-              previousMoveDirection = MoveDirection.DownRight;
-            } else {
-              _endPoint = _findEndPointMoveUpLeft(_alignment);
-              previousMoveDirection = MoveDirection.UpLeft;
-            }
-          }
-          break;
-        case MoveDirection.DownRight:
-          {
-            if (isLessOREqual(_alignment.x, -1.0) &&
-                isLessOREqual(_alignment.y, 1.0)) {
-              _endPoint = _findEndPointMoveDownLeft(_alignment);
-              previousMoveDirection = MoveDirection.DownLeft;
-            } else {
-              _endPoint = _findEndPointMoveUpRight(_alignment);
-              previousMoveDirection = MoveDirection.UpRight;
-            }
-          }
-          break;
-        case MoveDirection.UpLeft:
-          {
-            if (isBiggerOREqual(_alignment.x, 1.0) &&
-                isBiggerOREqual(_alignment.y, -1.0)) {
-              _endPoint = _findEndPointMoveUpRight(_alignment);
-              previousMoveDirection = MoveDirection.UpRight;
-            } else {
-              _endPoint = _findEndPointMoveDownLeft(_alignment);
-              previousMoveDirection = MoveDirection.DownLeft;
-            }
-          }
-          break;
-        case MoveDirection.UpRight:
-          {
-            if (isLessOREqual(_alignment.x, -1.0) &&
-                isBiggerOREqual(_alignment.y, -1.0)) {
-              _endPoint = _findEndPointMoveUpLeft(_alignment);
-              previousMoveDirection = MoveDirection.UpLeft;
-            } else {
-              _endPoint = _findEndPointMoveDownRight(_alignment);
-              previousMoveDirection = MoveDirection.DownRight;
-            }
-          }
-          break;
-        default:
-          {
-            _endPoint = (_alignment);
-          }
-          break;
-      }
-    }
-
-    return _endPoint;
-  }
-
-  Alignment _findEndPointHorizontal(
-      Alignment startPoint, MoveDirection direction) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    switch (direction) {
-      case MoveDirection.Left:
-        {
-          while (isLessOREqual(xStep, 1.0)) {
-            xStep += animationSpeedRate * _animationSpeed.x;
-          }
-
-          if (isBiggerOREqual(xStep, 1.0)) xStep = 1.0;
-          return Alignment(xStep, yStep);
-        }
-      case MoveDirection.Right:
-        {
-          while (isBiggerOREqual(xStep, -1.0)) {
-            xStep -= animationSpeedRate * _animationSpeed.x;
-          }
-
-          if (isLessOREqual(xStep, -1.0)) xStep = -1.0;
-          return Alignment(xStep, yStep);
-        }
-      default:
-        return Alignment(xStep, yStep);
-    }
-  }
-
-  Alignment _findEndPointVertical(
-      Alignment startPoint, MoveDirection direction) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    switch (direction) {
-      case MoveDirection.Down:
-        {
-          while (isLessOREqual(yStep, 1.0)) {
-            yStep += animationSpeedRate * _animationSpeed.y;
-          }
-
-          if (isBiggerOREqual(yStep, 1.0)) yStep = 1.0;
-          return Alignment(xStep, yStep);
-        }
-      case MoveDirection.Up:
-        {
-          while (isBiggerOREqual(yStep, -1.0)) {
-            yStep -= animationSpeedRate * _animationSpeed.y;
-          }
-
-          if (isLessOREqual(yStep, -1.0)) yStep = -1.0;
-          return Alignment(xStep, yStep);
-        }
-      default:
-        return Alignment(xStep, yStep);
-    }
-  }
-
-  Alignment _findEndPointMoveDownLeft(Alignment startPoint) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    while (isLessOREqual(xStep, 1.0) && isLessOREqual(yStep, 1.0)) {
-      xStep += animationSpeedRate * _animationSpeed.x;
-      yStep += animationSpeedRate * _animationSpeed.y;
-    }
-
-    if (isBiggerOREqual(xStep, 1.0)) xStep = 1.0;
-    if (isBiggerOREqual(yStep, 1.0)) yStep = 1.0;
-
-    return Alignment(xStep, yStep);
-  }
-
-  Alignment _findEndPointMoveDownRight(Alignment startPoint) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    while (isBiggerOREqual(xStep, -1.0) && isLessOREqual(yStep, 1.0)) {
-      xStep -= animationSpeedRate * _animationSpeed.x;
-      yStep += animationSpeedRate * _animationSpeed.y;
-    }
-
-    if (isLessOREqual(xStep, -1.0)) xStep = -1.0;
-    if (isBiggerOREqual(yStep, 1.0)) yStep = 1.0;
-
-    return Alignment(xStep, yStep);
-  }
-
-  _findEndPointMoveUpRight(Alignment startPoint) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    while (isBiggerOREqual(xStep, -1.0) && isBiggerOREqual(yStep, -1.0)) {
-      xStep -= animationSpeedRate * _animationSpeed.x;
-      yStep -= animationSpeedRate * _animationSpeed.y;
-    }
-
-    if (isLessOREqual(xStep, -1.0)) xStep = -1.0;
-    if (isLessOREqual(yStep, -1.0)) yStep = -1.0;
-
-    return Alignment(xStep, yStep);
-  }
-
-  _findEndPointMoveUpLeft(Alignment startPoint) {
-    var xStep = startPoint.x;
-    var yStep = startPoint.y;
-
-    while (isLessOREqual(xStep, 1.0) && isBiggerOREqual(yStep, -1.0)) {
-      xStep += animationSpeedRate * _animationSpeed.x;
-      yStep -= animationSpeedRate * _animationSpeed.y;
-    }
-
-    if (isBiggerOREqual(xStep, 1.0)) xStep = 1.0;
-    if (isLessOREqual(yStep, -1.0)) yStep = -1.0;
-
-    return Alignment(xStep, yStep);
-  }
 
   void _runAnimation() async {
     Alignment _end;
     if (firstRun) {
       firstRun = false;
-      _end = _findEndPointForFirstMove();
+      _end = AnimationHelper.findEndPointForFirstMove(
+        _alignment, _animationSpeed, previousMoveDirection);
     } else {
-      _end = _findEndPointForNextMove();
+      _end = AnimationHelper.findEndPointForNextMove(
+        _alignment, _animationSpeed, previousMoveDirection);
     }
 
     // Calculate the velocity ti the unit interval, [0, 1]
@@ -357,23 +92,36 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     // final unitsSecond = Offset(unitsPerSecondX, unitsPerSecondY);
     // final unitVelocity = unitsSecond.distance;
 
-    const spring = SpringDescription(
-      mass: 30,
-      stiffness: 1,
-      damping: 1,
+    final start = Offset(_alignment.x, _alignment.y);
+    final end = Offset(_end.x, _end.y);
+    final distance = (start - end).distance;
+
+
+    var gravity  = GravitySimulation(
+      1,
+      distance,
+      2,
+      1
     );
 
-    final simulation = SpringSimulation(
-      spring,
-      0,
-      1,
-      -1,
-    );
+
+    // const spring = SpringDescription(
+    //   mass: 30,
+    //   stiffness: 1,
+    //   damping: 1,
+    // );
+
+    // final simulation = SpringSimulation(
+    //   spring,
+    //   0,
+    //   1,
+    //   -1,
+    // );
 
     _animation =
         _controller.drive(AlignmentTween(begin: _alignment, end: _end));
 
-    _controller.animateWith(simulation);
+    _controller.animateWith(gravity);
 
     // _controller.reset();
     // _controller.forward();
@@ -395,11 +143,11 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           alignment: _alignment,
           child: Container(
             decoration: const BoxDecoration(
-                shape: BoxShape.circle, //making box to circle
-                color: Colors.deepOrangeAccent //background of container
-                ),
-            height: 100, //value from animation controller
-            width: 100, //value from animation controller
+                shape: BoxShape.circle, 
+                color: Colors.deepOrangeAccent,
+            ),
+            height: 100,
+            width: 100, 
           ),
         ),
       ),
@@ -408,38 +156,12 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
 
   Future<bool> _willPopCallback() async {
     
-    getBollCoordinates();
+    var point = AnimationHelper.getBollCoordinates(_screenWidth, _screenHeight, _alignment);
     
     setState(() {
       firstRun = true;
     });
     return Future.value(true);
-  }
-
-  void getBollCoordinates() {
-    var halfOfHorizontalScreenInPixels = _screenWidth / 2;
-    var halfOfVerticalScreenInPixels = _screenHeight / 2;
-
-    var halfHorizontalCoef = 1 / halfOfHorizontalScreenInPixels;
-    var halfVerticalCoef = 1 / halfOfVerticalScreenInPixels;
-    var X = 0.0, Y = 0.0;
-    var resultX = 0, resultY = 0;
-
-    if (_alignment.x.isNegative) {
-      X = (1 - _alignment.x.abs()) / halfHorizontalCoef;
-    } else {
-      X = (1 - _alignment.x) / halfHorizontalCoef;
-      X += halfOfHorizontalScreenInPixels;
-    }
-    resultX = X.round();
-
-    if (_alignment.y.isNegative) {
-      Y = (1 - _alignment.y.abs()) / halfVerticalCoef;
-    } else {
-      Y = (1 - _alignment.y) / halfVerticalCoef;
-      Y += halfOfVerticalScreenInPixels;
-    }
-    resultY = Y.round();
   }
 
   @override
