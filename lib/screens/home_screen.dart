@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Set animation speed',
+          'Set Animation Speed',
           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
         ),
       ),
@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 20.0,
             ),
             const Text(
-              "Set Horizontal speed",
+              "Set Horizontal Step Speed",
               style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24.0),
             ),
             const SizedBox(
@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 Text(
                   _xSpeed.toString(),
-                  style: TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
+                  style: const TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
                 ),
               ],
             ),
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50.0,
             ),
             const Text(
-              "Set Vertical speed",
+              "Set Vertical Step Speed",
               style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24.0),
             ),
             const SizedBox(
@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 Text(
                   _ySpeed.toString(),
-                  style: TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
+                  style: const TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
                 ),
               ],
             ),

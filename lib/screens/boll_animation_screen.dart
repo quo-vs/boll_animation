@@ -32,12 +32,9 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   late AnimationController _controller;
   Alignment _alignment = Alignment.topLeft;
   late Animation<Alignment> _animation;
-  //late Timer _timer;
   late double _screenWidth;
   late double _screenHeight;
-  double animationSpeedRate = 0.01;
-  int coef = 1000000000;
-  double endBound = 0.0;
+  double animationSpeedRate = 0.001;
 
   late MoveDirection previousMoveDirection;
 
@@ -48,10 +45,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     super.initState();
 
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 100));
-    // _timer = Timer.periodic(Duration(milliseconds: 3000), (timer) {
-    //   _runAnimation();
-    //  });
+        vsync: this, duration: const Duration(milliseconds: 3000));
     _controller.addListener(() {
       setState(() {
         _alignment = _animation.value;
@@ -63,14 +57,13 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
         _runAnimation();
       }
     });
+    //add this to access the context safely.
     WidgetsBinding.instance?.addPostFrameCallback(
-        (_) => loopOnce(context)); //i add this to access the context safely.
+        (_) => loopOnce(context)); 
   }
 
   Future<void> loopOnce(BuildContext context) async {
-    // await Future.delayed(Duration(seconds: 1));
     await _controller.forward();
-    //we can add duration here
     await Future.delayed(const Duration(seconds: 1));
   }
 
@@ -91,21 +84,6 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     }
   }
 
-  bool isEqual(double a, double b) {
-    var aString = a.toStringAsFixed(10);
-    var bString = b.toStringAsFixed(10);
-
-    var aIntPart = int.parse(aString.split('.')[0]);
-    var aDecimalPart = int.parse(aString.split('.')[1]);
-
-    var bIntPart = int.parse(bString.split('.')[0]);
-    var bDecimalPart = int.parse(bString.split('.')[1]);
-
-    return (aIntPart == bIntPart && aDecimalPart == bDecimalPart) ||
-        (++aIntPart == bIntPart && aDecimalPart > 9999999999) ||
-        (--aIntPart == bIntPart && aDecimalPart > 9999999999);
-  }
-
   bool isBiggerOREqual(double a, double b) {
     var aString = a.toStringAsFixed(10);
     var bString = b.toStringAsFixed(10);
@@ -119,9 +97,15 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     var bDecimalPart = num.parse(bString.split('.')[1]);
     bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
 
-    return  (aIntPart > bIntPart) ||
-            (aIntPart == bIntPart && aIntPart.isNegative && bIntPart.isNegative && aDecimalPart <= bDecimalPart) ||
-            (aIntPart == bIntPart && !aIntPart.isNegative && !bIntPart.isNegative && aDecimalPart >= bDecimalPart);
+    return (aIntPart > bIntPart) ||
+        (aIntPart == bIntPart &&
+            aIntPart.isNegative &&
+            bIntPart.isNegative &&
+            aDecimalPart <= bDecimalPart) ||
+        (aIntPart == bIntPart &&
+            !aIntPart.isNegative &&
+            !bIntPart.isNegative &&
+            aDecimalPart >= bDecimalPart);
   }
 
   bool isLessOREqual(double a, double b) {
@@ -138,8 +122,14 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
 
     return (aIntPart < bIntPart) ||
-        (aIntPart == bIntPart && !aIntPart.isNegative && !bIntPart.isNegative && aDecimalPart <= bDecimalPart) ||
-        (aIntPart == bIntPart && aIntPart.isNegative && bIntPart.isNegative && aDecimalPart >= bDecimalPart);
+        (aIntPart == bIntPart &&
+            !aIntPart.isNegative &&
+            !bIntPart.isNegative &&
+            aDecimalPart <= bDecimalPart) ||
+        (aIntPart == bIntPart &&
+            aIntPart.isNegative &&
+            bIntPart.isNegative &&
+            aDecimalPart >= bDecimalPart);
   }
 
   Alignment _findEndPointForFirstMove() {
@@ -175,7 +165,8 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
       switch (previousMoveDirection) {
         case MoveDirection.DownLeft:
           {
-            if (isBiggerOREqual(_alignment.x, 1.0) && isLessOREqual(_alignment.y, 1.0)) {
+            if (isBiggerOREqual(_alignment.x, 1.0) &&
+                isLessOREqual(_alignment.y, 1.0)) {
               _endPoint = _findEndPointMoveDownRight(_alignment);
               previousMoveDirection = MoveDirection.DownRight;
             } else {
@@ -186,7 +177,8 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           break;
         case MoveDirection.DownRight:
           {
-            if (isLessOREqual(_alignment.x, -1.0) && isLessOREqual(_alignment.y, 1.0)) {
+            if (isLessOREqual(_alignment.x, -1.0) &&
+                isLessOREqual(_alignment.y, 1.0)) {
               _endPoint = _findEndPointMoveDownLeft(_alignment);
               previousMoveDirection = MoveDirection.DownLeft;
             } else {
@@ -197,7 +189,8 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           break;
         case MoveDirection.UpLeft:
           {
-            if (isBiggerOREqual(_alignment.x, 1.0) && isBiggerOREqual(_alignment.y, -1.0)) {
+            if (isBiggerOREqual(_alignment.x, 1.0) &&
+                isBiggerOREqual(_alignment.y, -1.0)) {
               _endPoint = _findEndPointMoveUpRight(_alignment);
               previousMoveDirection = MoveDirection.UpRight;
             } else {
@@ -208,7 +201,8 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           break;
         case MoveDirection.UpRight:
           {
-            if (isLessOREqual(_alignment.x, -1.0) && isBiggerOREqual(_alignment.y, -1.0)) {
+            if (isLessOREqual(_alignment.x, -1.0) &&
+                isBiggerOREqual(_alignment.y, -1.0)) {
               _endPoint = _findEndPointMoveUpLeft(_alignment);
               previousMoveDirection = MoveDirection.UpLeft;
             } else {
@@ -223,7 +217,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           }
           break;
       }
-  }
+    }
 
     return _endPoint;
   }
@@ -355,23 +349,34 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
       _end = _findEndPointForNextMove();
     }
 
-    //  else if (isEqual(_alignment.x, 1.0) && isLessOREqual(_alignment.y, 1.0)) {
-    //   _end = _findEndPointMoveDownRight(_alignment);
-    // } else if (isBiggerOREqual(_alignment.x, 0.0) &&
-    //     isEqual(_alignment.y, 1.0)) {
-    //   _end = _findEndPointMoveUpRight(_alignment);
-    // } else if (isLessOREqual(_alignment.x, 0.0) && isEqual(_alignment.y, 1.0)) {
-    //   _end = _findEndPointMoveUpLeft(_alignment);
-    // } else {
-    //   _end = _findEndPointMoveDownLeft(_alignment);
-    // }
+    // Calculate the velocity ti the unit interval, [0, 1]
+    // used by Amination Controller
+    // final unitsPerSecondX = pixelsPerSeconds.dx / size.width;
+    // final unitsPerSecondY = pixelsPerSeconds.dx / size.height;
+
+    // final unitsSecond = Offset(unitsPerSecondX, unitsPerSecondY);
+    // final unitVelocity = unitsSecond.distance;
+
+    const spring = SpringDescription(
+      mass: 30,
+      stiffness: 1,
+      damping: 1,
+    );
+
+    final simulation = SpringSimulation(
+      spring,
+      0,
+      1,
+      -1,
+    );
 
     _animation =
         _controller.drive(AlignmentTween(begin: _alignment, end: _end));
 
-    _controller.reset();
+    _controller.animateWith(simulation);
 
-    _controller.forward();
+    // _controller.reset();
+    // _controller.forward();
   }
 
   @override
@@ -402,17 +407,23 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   }
 
   Future<bool> _willPopCallback() async {
-    // _timer.cancel();
+    
+    getBollCoordinates();
+    
+    setState(() {
+      firstRun = true;
+    });
+    return Future.value(true);
+  }
+
+  void getBollCoordinates() {
     var halfOfHorizontalScreenInPixels = _screenWidth / 2;
     var halfOfVerticalScreenInPixels = _screenHeight / 2;
 
     var halfHorizontalCoef = 1 / halfOfHorizontalScreenInPixels;
     var halfVerticalCoef = 1 / halfOfVerticalScreenInPixels;
-    var X = 0.0;
-    var Y = 0.0;
-
-    var resultX = 0;
-    var resultY = 0;
+    var X = 0.0, Y = 0.0;
+    var resultX = 0, resultY = 0;
 
     if (_alignment.x.isNegative) {
       X = (1 - _alignment.x.abs()) / halfHorizontalCoef;
@@ -429,10 +440,6 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
       Y += halfOfVerticalScreenInPixels;
     }
     resultY = Y.round();
-    setState(() {
-      firstRun = true;
-    });
-    return Future.value(true);
   }
 
   @override
