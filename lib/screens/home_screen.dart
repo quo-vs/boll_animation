@@ -115,13 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   var result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => BollAnimationScreen(
-                            animationSpeed:
-                                AnimationSpeed(x: _xSpeed, y: _ySpeed)),
-                        fullscreenDialog: true,
-                      ));
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => BollAnimationScreen(
+                          animationSpeed:
+                              AnimationSpeed(x: _xSpeed, y: _ySpeed)),
+                      fullscreenDialog: true,
+                    ),
+                  );
                   if (result != null) {
                     setState(() {
                       _coordinates = result;
