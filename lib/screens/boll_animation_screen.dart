@@ -97,6 +97,10 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           iconTheme: const IconThemeData(
             color: Colors.black,
           ),
+          leading:  IconButton(
+            onPressed: _willPopCallback,
+            icon: const Icon(Icons.arrow_back),
+          ),
         ),
         body: Align(
           alignment: _alignment,
@@ -114,6 +118,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   }
 
   Future<bool> _willPopCallback() async {
+    _controller.stop();
     var coordinates = AnimationHelper.getBollCoordinates(
         _screenWidth, _screenHeight, _alignment);
 

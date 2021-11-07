@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return AlertDialog(
           title: Text(errorText),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('OK'),
             ),
