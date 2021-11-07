@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import '../models/animation_speed.dart';
 
 class AnimationHelper {
-  static double animationSpeedRate = 0.001;
+  static double animationSpeedRate = 0.001;  
+  static MoveDirection previousMoveDirection = MoveDirection.left;
 
-  static Alignment findEndPointForFirstMove(Alignment alignment, AnimationSpeed animationSpeed, 
-    MoveDirection previousMoveDirection) 
+  static Alignment findEndPointForFirstMove(Alignment alignment, AnimationSpeed animationSpeed) 
   {
     Alignment _endPoint;
     if (animationSpeed.y == 0) {
@@ -24,8 +24,7 @@ class AnimationHelper {
     return _endPoint;
   }
 
-  static Alignment findEndPointForNextMove(Alignment alignment, AnimationSpeed animationSpeed, 
-    MoveDirection previousMoveDirection) {
+  static Alignment findEndPointForNextMove(Alignment alignment, AnimationSpeed animationSpeed) {
     Alignment _endPoint;
     if (animationSpeed.y == 0) {
       var _nextMoveDirection = previousMoveDirection == MoveDirection.left

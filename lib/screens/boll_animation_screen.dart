@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 
 import '../models/animation_speed.dart';
 import '../utils/animation_helper.dart';
@@ -23,8 +22,6 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   late Animation<Alignment> _animation;
   late double _screenWidth;
   late double _screenHeight;
-
-  late MoveDirection previousMoveDirection;
 
   var firstRun = true;
 
@@ -78,10 +75,10 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     if (firstRun) {
       firstRun = false;
       _end = AnimationHelper.findEndPointForFirstMove(
-        _alignment, _animationSpeed, previousMoveDirection);
+        _alignment, _animationSpeed);
     } else {
       _end = AnimationHelper.findEndPointForNextMove(
-        _alignment, _animationSpeed, previousMoveDirection);
+        _alignment, _animationSpeed);
     }
 
     // Calculate the velocity ti the unit interval, [0, 1]
@@ -92,17 +89,17 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     // final unitsSecond = Offset(unitsPerSecondX, unitsPerSecondY);
     // final unitVelocity = unitsSecond.distance;
 
-    final start = Offset(_alignment.x, _alignment.y);
-    final end = Offset(_end.x, _end.y);
-    final distance = (start - end).distance;
+    // final start = Offset(_alignment.x, _alignment.y);
+    // final end = Offset(_end.x, _end.y);
+    // final distance = (start - end).distance;
 
 
-    var gravity  = GravitySimulation(
-      1,
-      distance,
-      2,
-      1
-    );
+    // var gravity  = GravitySimulation(
+    //   1,
+    //   distance,
+    //   2,
+    //   1
+    // );
 
 
     // const spring = SpringDescription(
@@ -121,10 +118,10 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     _animation =
         _controller.drive(AlignmentTween(begin: _alignment, end: _end));
 
-    _controller.animateWith(gravity);
+    //_controller.animateWith(gravity);
 
-    // _controller.reset();
-    // _controller.forward();
+     _controller.reset();
+     _controller.forward();
   }
 
   @override
