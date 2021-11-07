@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../models/animation_speed.dart';
@@ -13,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _xSpeed = 0.0;
   var _ySpeed = 0.0;
+  Point? _coordinates;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             const SizedBox(
-              height: 20.0,
+              height: 30.0,
             ),
             const Text(
               "Set Horizontal Step Speed",
@@ -44,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 Text(
                   _xSpeed.toString(),
-                  style: const TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                      fontSize: 40.0, fontWeight: FontWeight.w900),
                 ),
               ],
             ),
@@ -80,7 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 Text(
                   _ySpeed.toString(),
-                  style: const TextStyle(fontSize: 40.0, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                      fontSize: 40.0, fontWeight: FontWeight.w900),
                 ),
               ],
             ),
@@ -103,25 +108,57 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 20,
             ),
             ElevatedButton(
-              onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    BollAnimationScreen.routeName, arguments: AnimationSpeed(x: _xSpeed, y: _ySpeed),
-                  );
-              }, 
-              child: const Text(
-                'Show Animation'
-              )
-            ),
+                onPressed: () async {
+                  if (_xSpeed == 0 && _ySpeed == 0) {
+                    showErrorAlert(context, 'Please set at least one step speed.');
+                    return;
+                  }
+
+                  var result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => BollAnimationScreen(
+                            animationSpeed:
+                                AnimationSpeed(x: _xSpeed, y: _ySpeed)),
+                        fullscreenDialog: true,
+                      ));
+                  if (result != null) {
+                    setState(() {
+                      _coordinates = result;
+                    });
+                  }
+                },
+                child: const Text('Show Animation')),
             const SizedBox(
               height: 50,
             ),
-            const Text(
-              "Boll Coordinates:",
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22.0),
-            ),
+            if (_coordinates != null)
+              Text(
+                "Boll Coordinates: X:${_coordinates!.x} Y:${_coordinates!.y} ",
+                style: const TextStyle(
+                    fontWeight: FontWeight.w900, fontSize: 22.0),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  static Future<void> showErrorAlert(
+      BuildContext context, String errorText) async {
+    await showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(errorText),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

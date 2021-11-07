@@ -9,7 +9,8 @@ void main() {
       debugShowCheckedModeBanner: false,
       home: const HomeScreen(),
       routes: {
-        BollAnimationScreen.routeName: (ctx) => const BollAnimationScreen(),
+        BollAnimationScreen.routeName: 
+          (ctx) => BollAnimationScreen(animationSpeed: null,),
       },
     ),
   );

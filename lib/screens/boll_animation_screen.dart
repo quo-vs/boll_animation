@@ -8,7 +8,10 @@ import '../utils/animation_helper.dart';
 class BollAnimationScreen extends StatefulWidget {
   static const routeName = '/boll-animation';
 
-  const BollAnimationScreen({Key? key}) : super(key: key);
+  AnimationSpeed? animationSpeed;
+
+  BollAnimationScreen({Key? key, required this.animationSpeed})
+      : super(key: key);
 
   @override
   _BollAnimationScreenState createState() => _BollAnimationScreenState();
@@ -30,7 +33,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     super.initState();
 
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3000));
+        vsync: this, duration: const Duration(milliseconds: 1000));
     _controller.addListener(() {
       setState(() {
         _alignment = _animation.value;
@@ -43,8 +46,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
       }
     });
     //add this to access the context safely.
-    WidgetsBinding.instance?.addPostFrameCallback(
-        (_) => loopOnce(context)); 
+    WidgetsBinding.instance?.addPostFrameCallback((_) => loopOnce(context));
   }
 
   Future<void> loopOnce(BuildContext context) async {
@@ -59,69 +61,29 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
     _screenWidth = MediaQuery.of(context).size.width;
     _screenHeight = MediaQuery.of(context).size.height;
 
-    final speed = ModalRoute.of(context)?.settings.arguments as AnimationSpeed?;
+    var speed = ModalRoute.of(context)?.settings.arguments as AnimationSpeed?;
+    speed ??= widget.animationSpeed;
     if (speed != null) {
       setState(() {
-        _animationSpeed = speed;
-
+        _animationSpeed = speed!;
         _runAnimation();
       });
     }
   }
 
-
   void _runAnimation() async {
     Alignment _end;
     if (firstRun) {
       firstRun = false;
-      _end = AnimationHelper.findEndPointForFirstMove(
-        _alignment, _animationSpeed);
+      _end = AnimationHelper.findEndPointForFirstMove(_alignment, _animationSpeed);
     } else {
-      _end = AnimationHelper.findEndPointForNextMove(
-        _alignment, _animationSpeed);
+      _end = AnimationHelper.findEndPointForNextMove(_alignment, _animationSpeed);
     }
 
-    // Calculate the velocity ti the unit interval, [0, 1]
-    // used by Amination Controller
-    // final unitsPerSecondX = pixelsPerSeconds.dx / size.width;
-    // final unitsPerSecondY = pixelsPerSeconds.dx / size.height;
+    _animation = _controller.drive(AlignmentTween(begin: _alignment, end: _end));
 
-    // final unitsSecond = Offset(unitsPerSecondX, unitsPerSecondY);
-    // final unitVelocity = unitsSecond.distance;
-
-    // final start = Offset(_alignment.x, _alignment.y);
-    // final end = Offset(_end.x, _end.y);
-    // final distance = (start - end).distance;
-
-
-    // var gravity  = GravitySimulation(
-    //   1,
-    //   distance,
-    //   2,
-    //   1
-    // );
-
-
-    // const spring = SpringDescription(
-    //   mass: 30,
-    //   stiffness: 1,
-    //   damping: 1,
-    // );
-
-    // final simulation = SpringSimulation(
-    //   spring,
-    //   0,
-    //   1,
-    //   -1,
-    // );
-
-    _animation =
-        _controller.drive(AlignmentTween(begin: _alignment, end: _end));
-
-    //_controller.animateWith(gravity);
-
-     _controller.reset();
-     _controller.forward();
+    _controller.reset();
+    _controller.forward();
   }
 
   @override
@@ -131,7 +93,7 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          elevation: 0,
+          elevation: 1,
           iconTheme: const IconThemeData(
             color: Colors.black,
           ),
@@ -140,11 +102,11 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
           alignment: _alignment,
           child: Container(
             decoration: const BoxDecoration(
-                shape: BoxShape.circle, 
-                color: Colors.deepOrangeAccent,
+              shape: BoxShape.circle,
+              color: Colors.deepOrangeAccent,
             ),
             height: 100,
-            width: 100, 
+            width: 100,
           ),
         ),
       ),
@@ -152,12 +114,13 @@ class _BollAnimationScreenState extends State<BollAnimationScreen>
   }
 
   Future<bool> _willPopCallback() async {
-    
-    var point = AnimationHelper.getBollCoordinates(_screenWidth, _screenHeight, _alignment);
-    
+    var coordinates = AnimationHelper.getBollCoordinates(
+        _screenWidth, _screenHeight, _alignment);
+
     setState(() {
       firstRun = true;
     });
+    Navigator.pop(context, coordinates);
     return Future.value(true);
   }
 
