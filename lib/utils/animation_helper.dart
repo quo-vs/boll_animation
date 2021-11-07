@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../models/parsed_double.dart';
 import '../models/animation_speed.dart';
 
 class AnimationHelper {
@@ -236,7 +237,6 @@ class AnimationHelper {
     var halfHorizontalCoef = 1 / halfOfHorizontalScreenInPixels;
     var halfVerticalCoef = 1 / halfOfVerticalScreenInPixels;
     var X = 0.0, Y = 0.0;
-    var resultX = 0, resultY = 0;
 
     if (alignment.x.isNegative) {
       X = (1 - alignment.x.abs()) / halfHorizontalCoef;
@@ -244,7 +244,6 @@ class AnimationHelper {
       X = (1 - alignment.x) / halfHorizontalCoef;
       X += halfOfHorizontalScreenInPixels;
     }
-    resultX = X.round();
 
     if (alignment.y.isNegative) {
       Y = (1 - alignment.y.abs()) / halfVerticalCoef;
@@ -252,48 +251,42 @@ class AnimationHelper {
       Y = (1 - alignment.y) / halfVerticalCoef;
       Y += halfOfVerticalScreenInPixels;
     }
-    resultY = Y.round();
 
-    return Point(resultX, resultY);
+    return Point(X.round(), Y.round());
   }
 
-    static bool isBiggerOREqual(double a, double b) {
-    var aString = a.toStringAsFixed(10);
-    var bString = b.toStringAsFixed(10);
-    var decimalPartIfZero = 000000001;
+  static ParsedDouble parceDouble(double a) {
+    var asString = a.toStringAsFixed(10);
+    var intPart = num.parse(asString.split('.')[0]);
+    var decimalPart = num.parse(asString.split('.')[1]);
+    decimalPart = decimalPart == 0 ? 1 : decimalPart;
 
-    var aIntPart = num.parse(aString.split('.')[0]);
-    var aDecimalPart = num.parse(aString.split('.')[1]);
-    aDecimalPart = aDecimalPart == 0 ? decimalPartIfZero : aDecimalPart;
+    return ParsedDouble(intPart, decimalPart);
+  }
 
-    var bIntPart = num.parse(bString.split('.')[0]);
-    var bDecimalPart = num.parse(bString.split('.')[1]);
-    bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
+  static bool isBiggerOREqual(double a, double b) {
+    var aParsed = parceDouble(a);
+    var bParsed = parceDouble(b);
 
-    return (aIntPart > bIntPart) ||
-        (aIntPart == bIntPart && aIntPart.isNegative && 
-          bIntPart.isNegative && aDecimalPart <= bDecimalPart) ||
-        (aIntPart == bIntPart && !aIntPart.isNegative &&
-            !bIntPart.isNegative && aDecimalPart >= bDecimalPart);
+    var intPartIsBigger = aParsed.intPart > bParsed.intPart;
+    var positiveNumberIsBiggerOrEqual = (aParsed.intPart == bParsed.intPart && aParsed.intPart.isNegative && 
+          bParsed.intPart.isNegative && aParsed.decimalPart <= bParsed.decimalPart);
+    var negativeNumberIsBiggerOrEqual = (aParsed.intPart == bParsed.intPart && !aParsed.intPart.isNegative &&
+            !bParsed.intPart.isNegative && aParsed.decimalPart >= bParsed.decimalPart);
+
+    return intPartIsBigger || positiveNumberIsBiggerOrEqual || negativeNumberIsBiggerOrEqual;
   }
 
   static bool isLessOREqual(double a, double b) {
-    var aString = a.toStringAsFixed(10);
-    var bString = b.toStringAsFixed(10);
-    var decimalPartIfZero = 1;
+    var aParsed = parceDouble(a);
+    var bParsed = parceDouble(b);
 
-    var aIntPart = num.parse(aString.split('.')[0]);
-    var aDecimalPart = num.parse(aString.split('.')[1]);
-    aDecimalPart = aDecimalPart == 0 ? decimalPartIfZero : aDecimalPart;
+    var intPartIsLess = aParsed.intPart < bParsed.intPart;
+    var positiveNumberIsLessOrEqual = (aParsed.intPart == bParsed.intPart && !aParsed.intPart.isNegative &&
+            !bParsed.intPart.isNegative && aParsed.decimalPart <= bParsed.decimalPart);
+    var negativeNumberIsLessOrEqual = (aParsed.intPart == bParsed.intPart && aParsed.intPart.isNegative &&
+            bParsed.intPart.isNegative && aParsed.decimalPart >= bParsed.decimalPart);
 
-    var bIntPart = num.parse(bString.split('.')[0]);
-    var bDecimalPart = num.parse(bString.split('.')[1]);
-    bDecimalPart = bDecimalPart == 0 ? decimalPartIfZero : bDecimalPart;
-
-    return (aIntPart < bIntPart) ||
-        (aIntPart == bIntPart && !aIntPart.isNegative &&
-            !bIntPart.isNegative && aDecimalPart <= bDecimalPart) ||
-        (aIntPart == bIntPart && aIntPart.isNegative &&
-            bIntPart.isNegative && aDecimalPart >= bDecimalPart);
+    return intPartIsLess || positiveNumberIsLessOrEqual || negativeNumberIsLessOrEqual;
   }
 }
