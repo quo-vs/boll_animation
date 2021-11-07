@@ -6,4 +6,4 @@ Flutter project to animate boll on the screen
 
  Home Screen                    | Boll Animation Screen          |            
 :------------------------------:|:-------------------------------:|
-![](../master/screenshots/2.png)|  ![](../master/screenshots/1.png)| 
+![](../master/screenshots/3.png)|  ![](../master/screenshots/1.png)| 
